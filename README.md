@@ -31,6 +31,10 @@ onboarding keys, git/registry accounts or secret variables. See `src/policy.ts`.
 | `KOMODO_MCP_ALLOW_DESTRUCTIVE` | `false` | Allow destructive execute/write calls |
 | `KOMODO_MCP_ALLOW_EXEC` | `false` | Allow `komodo_exec` |
 | `KOMODO_MCP_EXEC_TIMEOUT_MS` | `120000` | Timeout for `komodo_exec` |
+| `MCP_TRANSPORT` | `stdio` | `stdio`, or `http` to serve Streamable HTTP on `/mcp` |
+| `MCP_AUTH_TOKEN` / `MCP_AUTH_TOKEN_FILE` | required for `http` | Bearer token clients must send (32+ characters) |
+| `MCP_HOST` | `127.0.0.1` | Address the HTTP server listens on |
+| `MCP_PORT` | `3010` | Port the HTTP server listens on |
 
 The API key's Komodo permissions are the real limit: the server can never do more than the key's user.
 
@@ -57,6 +61,29 @@ claude mcp add komodo -s user \
 Add `-e KOMODO_MCP_ALLOW_DESTRUCTIVE=true` and/or `-e KOMODO_MCP_ALLOW_EXEC=true` for full control.
 Claude Code asks before each tool call unless you allow the tool, so keep `komodo_execute`,
 `komodo_write` and `komodo_exec` off your allowlist if you want to approve every change.
+
+## Run as an HTTP service (for a domain)
+
+With `MCP_TRANSPORT=http` the server keeps running and answers MCP requests on `/mcp`.
+Every request needs `Authorization: Bearer <MCP_AUTH_TOKEN>`; `GET /healthz` is open for health checks.
+It listens on localhost only by default: put a reverse proxy or a Cloudflare Tunnel in front for HTTPS.
+
+```bash
+openssl rand -hex 32   # use as MCP_AUTH_TOKEN
+MCP_TRANSPORT=http MCP_AUTH_TOKEN=... KOMODO_URL=... KOMODO_API_KEY=... KOMODO_API_SECRET=... \
+  node dist/index.js
+```
+
+Connect Claude Code to it:
+
+```bash
+claude mcp add --transport http komodo https://your-mcp-domain/mcp \
+  --header "Authorization: Bearer <token>"
+```
+
+Anyone who can reach the domain is stopped only by the token, so keep it secret, keep
+destructive actions and exec off unless needed, and consider an access layer such as
+Cloudflare Access in front.
 
 ## Upgrading komodo_client
 
