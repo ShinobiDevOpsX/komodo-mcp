@@ -51,7 +51,7 @@ claude mcp add komodo -s user \
   -e KOMODO_URL=https://your-komodo-host \
   -e KOMODO_API_KEY=your-key \
   -e KOMODO_API_SECRET=your-secret \
-  -- node /home/druv/project/komodo-mcp/dist/index.js
+  -- node /path/to/komodo-mcp/dist/index.js
 ```
 
 Add `-e KOMODO_MCP_ALLOW_DESTRUCTIVE=true` and/or `-e KOMODO_MCP_ALLOW_EXEC=true` for full control.
