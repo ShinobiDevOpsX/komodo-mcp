@@ -1,0 +1,15 @@
+# docker compose up -d --build
+# Settings (Komodo key/secret, MCP_AUTH_TOKEN, safety switches) come from the env file.
+services:
+  komodo-mcp:
+    build: .
+    image: komodo-mcp:local
+    container_name: komodo-mcp
+    restart: unless-stopped
+    env_file: ${KOMODO_MCP_ENV_FILE:-~/.config/komodo-mcp.env}
+    environment:
+      MCP_TRANSPORT: http
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: "3010"
+    ports:
+      - "127.0.0.1:3010:3010" # localhost only; put a reverse proxy or tunnel in front

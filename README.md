@@ -85,6 +85,22 @@ Anyone who can reach the domain is stopped only by the token, so keep it secret,
 destructive actions and exec off unless needed, and consider an access layer such as
 Cloudflare Access in front.
 
+### With Docker
+
+`compose.yaml` builds the image and runs it in HTTP mode, published on `127.0.0.1:3010` only.
+Settings come from `~/.config/komodo-mcp.env` (override with `KOMODO_MCP_ENV_FILE`): the
+Komodo URL, key and secret, `MCP_AUTH_TOKEN`, and the safety switches. `MCP_TRANSPORT`,
+`MCP_HOST` and `MCP_PORT` are set by the compose file.
+
+```bash
+chmod 600 ~/.config/komodo-mcp.env
+docker compose up -d --build
+curl -s http://127.0.0.1:3010/healthz   # {"ok":true}
+```
+
+Update with `git pull && docker compose up -d --build`. The container runs as the
+unprivileged `node` user and has a health check.
+
 ## Upgrading komodo_client
 
 ```bash
